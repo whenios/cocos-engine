@@ -38,7 +38,7 @@ const tempMat4 = new Mat4();
 export class AttachUtil {
     protected _isInitialized = false;
     protected _skeletonBones: spine.Bone[] | FrameBoneInfo[] | null = null;
-    protected _socketNodes: Map<number, Node> | null = null;
+    protected _socketNodes: Map<number, Node[]> | null = null;
     private _keysToDelete: number[] = [];
 
     constructor () {
@@ -70,13 +70,19 @@ export class AttachUtil {
     _syncAttachedNode (): void {
         if (!this._isInitialized) return;
         const socketNodes = this._socketNodes!;
-        for (const [boneIdx, boneNode] of socketNodes) {
-            if (!boneNode || !boneNode.isValid) {
+        for (const [boneIdx, boneNodes] of socketNodes) {
+            if (boneNodes.length <= 0) {
                 this._keysToDelete.push(boneIdx);
                 continue;
             }
-            const bone =  this._skeletonBones![boneIdx];
-            if (bone) this.matrixHandle(boneNode, bone);
+            for (const boneNode of boneNodes) {     
+                if (!boneNode || !boneNode.isValid) {
+                    this._keysToDelete.push(boneIdx);
+                    break;
+                }
+                const bone =  this._skeletonBones![boneIdx];
+                if (bone) this.matrixHandle(boneNode, bone);
+            }
         }
         if (this._keysToDelete.length <= 0) return;
         for (const boneIdx of this._keysToDelete) {

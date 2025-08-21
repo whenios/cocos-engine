@@ -265,7 +265,7 @@ export class Skeleton extends UIRenderer {
     protected _enumSkins: EnumType = Enum({});
     protected _enumAnimations: EnumType = Enum({});
     protected attachUtil: AttachUtil;
-    protected _socketNodes: Map<number, Node> = new Map();
+    protected _socketNodes: Map<number, Node[]> = new Map();
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
 
     /**
@@ -613,7 +613,7 @@ export class Skeleton extends UIRenderer {
             this._markForUpdateRenderData();
         }
     }
-    get socketNodes (): Map<number, Node> | null { return this._socketNodes; }
+    get socketNodes (): Map<number, Node[]> | null { return this._socketNodes; }
 
     /**
      * @en The name of current playing animation.
@@ -1591,7 +1591,10 @@ export class Skeleton extends UIRenderer {
                     error(`Skeleton data does not contain path ${socket.path}`);
                     continue;
                 }
-                this._socketNodes.set(boneIdx, socket.target);
+                if (!this._socketNodes.get(boneIdx)) {
+                    this._socketNodes.set(boneIdx, []);
+                }
+                this._socketNodes.get(boneIdx)!.push(socket.target);
             }
         }
     }
