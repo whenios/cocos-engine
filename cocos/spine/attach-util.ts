@@ -71,7 +71,7 @@ export class AttachUtil {
         if (!this._isInitialized) return;
         const socketNodes = this._socketNodes!;
         for (const [boneIdx, boneNodes] of socketNodes) {
-            if (boneNodes.length <= 0) {
+            if (!boneNodes || boneNodes.length <= 0) {
                 this._keysToDelete.push(boneIdx);
                 continue;
             }
